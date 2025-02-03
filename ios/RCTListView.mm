@@ -1,20 +1,21 @@
-#import "ListView.h"
+#import "RCTListView.h"
+#import "react_native_list-Swift.h"
 
-#import "generated/RNListViewSpec/ComponentDescriptors.h"
-#import "generated/RNListViewSpec/EventEmitters.h"
-#import "generated/RNListViewSpec/Props.h"
-#import "generated/RNListViewSpec/RCTComponentViewHelpers.h"
+#import <react/renderer/components/RNListViewSpec/ComponentDescriptors.h>
+#import <react/renderer/components/RNListViewSpec/EventEmitters.h>
+#import <react/renderer/components/RNListViewSpec/Props.h>
+#import <react/renderer/components/RNListViewSpec/RCTComponentViewHelpers.h>
 
 #import "RCTFabricComponentsPlugins.h"
 
 using namespace facebook::react;
 
-@interface ListView () <RCTListViewViewProtocol>
+@interface RCTListView () <RCTListViewViewProtocol>
 
 @end
 
-@implementation ListView {
-    UIView * _view;
+@implementation RCTListView {
+    ListViewProvider * _listViewProvider;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -27,10 +28,9 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const ListViewProps>();
     _props = defaultProps;
+    _listViewProvider = [[ListViewProvider alloc] init];
 
-    _view = [[UIView alloc] init];
-
-    self.contentView = _view;
+    self.contentView = _listViewProvider;
   }
 
   return self;
@@ -41,9 +41,13 @@ using namespace facebook::react;
     const auto &oldViewProps = *std::static_pointer_cast<ListViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<ListViewProps const>(props);
 
-    if (oldViewProps.color != newViewProps.color) {
-        NSString * colorToConvert = [[NSString alloc] initWithUTF8String: newViewProps.color.c_str()];
-        [_view setBackgroundColor:[self hexStringToColor:colorToConvert]];
+    if (newViewProps.items != oldViewProps.items) {
+        NSMutableArray *itemsArray = [NSMutableArray array];
+        for (const auto &item : newViewProps.items) {
+            NSString *objcString = [NSString stringWithUTF8String:item.c_str()];
+            [itemsArray addObject:objcString];
+        }
+        [_listViewProvider setItems:itemsArray];
     }
 
     [super updateProps:props oldProps:oldProps];
@@ -51,7 +55,7 @@ using namespace facebook::react;
 
 Class<RCTComponentViewProtocol> ListViewCls(void)
 {
-    return ListView.class;
+    return RCTListView.class;
 }
 
 - hexStringToColor:(NSString *)stringToConvert

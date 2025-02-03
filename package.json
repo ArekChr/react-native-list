@@ -160,7 +160,6 @@
     "source": "src",
     "output": "lib",
     "targets": [
-      "codegen",
       [
         "commonjs",
         {
@@ -186,14 +185,9 @@
     "name": "RNListViewSpec",
     "type": "all",
     "jsSrcsDir": "src",
-    "outputDir": {
-      "ios": "ios/generated",
-      "android": "android/generated"
-    },
     "android": {
       "javaPackageName": "com.list"
-    },
-    "includesGeneratedCode": true
+    }
   },
   "create-react-native-library": {
     "languages": "kotlin-objc",
